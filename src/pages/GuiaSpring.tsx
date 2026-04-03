@@ -1432,29 +1432,30 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // ← rutas públicas
-                .anyRequest().authenticated()            // ← todo lo demás requiere login
-            )
-            .authenticationProvider(authenticationProvider);
-
-        return http.build();
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf->csrf.disable())
+                .authorizeHttpRequests(auth->auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .securityContext((context) -> context
+                        .securityContextRepository(new HttpSessionSecurityContextRepository())
+                )
+                .authenticationProvider(authenticationProvider);
+        return  http.build();
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    public CorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration configuration=new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
         configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",configuration);
         return source;
     }
 }`}
@@ -1548,26 +1549,38 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     // REGISTRO: crea el usuario cifrando la contraseña
     @Transactional
-    public AuthResponse register(UsuarioDTO request) {
-        Usuario usuario = new Usuario();
-        usuario.setEmail(request.getEmail());
-        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        Usuario guardado = usuarioRepository.save(usuario);
-        return new AuthResponse(guardado.getId(), guardado.getEmail());
+    public AuthResponse register(UsuarioDTO usuarioDTO) {
+        Usuario usuario=new Usuario();
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
+        Usuario guardado=usuarioRepository.save(usuario);
+        return new AuthResponse(guardado.getId(),guardado.getEmail());
     }
 
     // LOGIN: valida credenciales
     @Transactional
-    public AuthResponse authenticate(AuthRequest request) {
-        // Si las credenciales son incorrectas lanza excepción automáticamente
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    public AuthResponse login(AuthRequest request){
+        Authentication auth=authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
         );
-        var user = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        HttpSession session = httpServletRequest.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        var user=usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
         return new AuthResponse(user.getId(), user.getEmail());
+    }
+    // LOGOUT: Cerrar Sesión
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
     }
 }`}
             />
@@ -1651,6 +1664,13 @@ public class AuthController {
                     /auth/**
                   </code>{" "}
                   son públicas.
+                </li>
+                <li>
+                  Para la correcta ejecución asegurarse de que sea version de
+                  spring{" "}
+                  <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
+                    4.0.1
+                  </code>{" "}
                 </li>
               </ol>
             </div>
