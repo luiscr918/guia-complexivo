@@ -18,8 +18,8 @@ export const GuiaReact = () => {
               React + Vite Reference
             </h1>
             <p className="text-xl text-slate-500 leading-relaxed font-medium">
-              Guía para consumir el backend Spring Boot desde un frontend
-              React + Vite + TypeScript con Tailwind, React Router DOM y Axios.
+              Guía para consumir el backend Spring Boot desde un frontend React
+              + Vite + TypeScript con Tailwind, React Router DOM y Axios.
             </p>
           </header>
 
@@ -120,15 +120,38 @@ export default {
 
             <div className="space-y-3 text-sm text-slate-600">
               {[
-                ["api/", "Solo contiene la configuración base de Axios (URL del backend, headers por defecto)."],
-                ["models/", "Interfaces TypeScript que reflejan exactamente los DTOs del backend."],
-                ["services/", "Una función por cada endpoint del backend. Aquí vive toda la lógica de llamadas HTTP."],
-                ["pages/", "Componentes de página completos. Consumen los services y renderizan la UI."],
-                ["components/", "Componentes reutilizables: Navbar, botones, formularios, PrivateRoute, etc."],
-                ["routes/", "Un solo archivo que centraliza todas las rutas de la aplicación."],
+                [
+                  "api/",
+                  "Solo contiene la configuración base de Axios (URL del backend, headers por defecto).",
+                ],
+                [
+                  "models/",
+                  "Interfaces TypeScript que reflejan exactamente los DTOs del backend.",
+                ],
+                [
+                  "services/",
+                  "Una función por cada endpoint del backend. Aquí vive toda la lógica de llamadas HTTP.",
+                ],
+                [
+                  "pages/",
+                  "Componentes de página completos. Consumen los services y renderizan la UI.",
+                ],
+                [
+                  "components/",
+                  "Componentes reutilizables: Navbar, botones, formularios, PrivateRoute, etc.",
+                ],
+                [
+                  "routes/",
+                  "Un solo archivo que centraliza todas las rutas de la aplicación.",
+                ],
               ].map(([folder, desc]) => (
-                <div key={folder} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-3">
-                  <code className="text-blue-600 font-bold font-mono text-xs whitespace-nowrap pt-0.5">{folder}</code>
+                <div
+                  key={folder}
+                  className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-3"
+                >
+                  <code className="text-blue-600 font-bold font-mono text-xs whitespace-nowrap pt-0.5">
+                    {folder}
+                  </code>
                   <p>{desc}</p>
                 </div>
               ))}
@@ -143,7 +166,11 @@ export default {
             <p className="mb-4 text-slate-600">
               Las interfaces reflejan exactamente los DTOs del backend. Son el
               "contrato" entre el front y el back. Un modelo por archivo dentro
-              de <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">src/models/</code>.
+              de{" "}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
+                src/models/
+              </code>
+              .
             </p>
 
             <CodeBlock
@@ -195,8 +222,11 @@ export interface AuthResponse {
               03. API — Configuración Axios
             </h2>
             <p className="mb-4 text-slate-600">
-              Un solo archivo en <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">src/api/axiosConfig.ts</code> que
-              configura la instancia base de Axios. Todos los services la
+              Un solo archivo en{" "}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
+                src/api/axiosConfig.ts
+              </code>{" "}
+              que configura la instancia base de Axios. Todos los services la
               importan desde aquí, nunca crean su propia instancia.
             </p>
 
@@ -205,14 +235,13 @@ export interface AuthResponse {
               code={`import axios from 'axios';
 
 // URL base de tu backend Spring Boot
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
+export const api = axios.create({
+  baseURL: "http://localhost:8080",
+  withCredentials: true, 
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-});
-
-export default api;`}
+});`}
             />
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-900 space-y-2">
@@ -368,9 +397,23 @@ export const deleteUsuario = async (id: number): Promise<void> => {
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900 space-y-1">
               <p className="font-bold">Patrón que se repite en cada service:</p>
-              <p>1. Importar <code className="bg-amber-100 px-1 rounded font-mono">api</code> desde axiosConfig.</p>
+              <p>
+                1. Importar{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">api</code>{" "}
+                desde axiosConfig.
+              </p>
               <p>2. Importar el modelo (interface) correspondiente.</p>
-              <p>3. Cada función es <code className="bg-amber-100 px-1 rounded font-mono">async</code>, llama a Axios con el método HTTP correcto, y devuelve <code className="bg-amber-100 px-1 rounded font-mono">response.data</code> tipado.</p>
+              <p>
+                3. Cada función es{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  async
+                </code>
+                , llama a Axios con el método HTTP correcto, y devuelve{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  response.data
+                </code>{" "}
+                tipado.
+              </p>
             </div>
           </section>
 
@@ -381,7 +424,9 @@ export const deleteUsuario = async (id: number): Promise<void> => {
             </h2>
             <p className="mb-4 text-slate-600">
               Todas las rutas centralizadas en un solo archivo. El componente{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">PrivateRoute</code>{" "}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
+                PrivateRoute
+              </code>{" "}
               protege las rutas que requieren estar logueado.
             </p>
 
@@ -451,9 +496,13 @@ export default App;`}
             </h2>
             <p className="mb-4 text-slate-600">
               Las páginas consumen los services con{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">useEffect</code>{" "}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
+                useEffect
+              </code>{" "}
               para cargar datos y{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">useState</code>{" "}
+              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
+                useState
+              </code>{" "}
               para manejar el estado local. Nunca llaman a Axios directamente.
             </p>
 
@@ -961,13 +1010,30 @@ export default ProductosPage;`}
 
             <div className="space-y-3 mt-6 text-sm text-slate-600">
               {[
-                ["useEffect(() => {}, [])", "Se ejecuta una vez al montar el componente. Aquí se hace la llamada inicial para cargar los datos."],
-                ["useState", "Maneja el estado local: la lista de datos, el formulario, el ID que se está editando y los errores."],
-                ["handleSubmit", "Detecta si estás en modo crear o editar según si editandoId tiene valor. Llama al service correcto y recarga la lista."],
-                ["cargarXxx()", "Función separada para recargar la lista. Se llama al montar y después de cada crear/editar/eliminar."],
+                [
+                  "useEffect(() => {}, [])",
+                  "Se ejecuta una vez al montar el componente. Aquí se hace la llamada inicial para cargar los datos.",
+                ],
+                [
+                  "useState",
+                  "Maneja el estado local: la lista de datos, el formulario, el ID que se está editando y los errores.",
+                ],
+                [
+                  "handleSubmit",
+                  "Detecta si estás en modo crear o editar según si editandoId tiene valor. Llama al service correcto y recarga la lista.",
+                ],
+                [
+                  "cargarXxx()",
+                  "Función separada para recargar la lista. Se llama al montar y después de cada crear/editar/eliminar.",
+                ],
               ].map(([title, desc]) => (
-                <div key={title} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">{title}</p>
+                <div
+                  key={title}
+                  className="bg-slate-50 border border-slate-200 rounded-xl p-4"
+                >
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    {title}
+                  </p>
                   <p>{desc}</p>
                 </div>
               ))}
@@ -981,14 +1047,41 @@ export default ProductosPage;`}
             </h2>
 
             <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-              <p className="font-bold text-slate-800 mb-4">🔄 De la UI al Backend y de vuelta</p>
+              <p className="font-bold text-slate-800 mb-4">
+                🔄 De la UI al Backend y de vuelta
+              </p>
               <ol className="space-y-3 text-sm text-slate-700 list-decimal list-inside">
-                <li>El usuario llena un formulario en la <strong>Page</strong> y hace submit.</li>
-                <li>La <strong>Page</strong> llama a una función del <strong>Service</strong> correspondiente.</li>
-                <li>El <strong>Service</strong> usa la instancia de Axios de <strong>axiosConfig</strong> para hacer el request HTTP al backend.</li>
-                <li>El backend Spring Boot procesa la petición y responde con un DTO en JSON.</li>
-                <li>Axios recibe la respuesta, el service devuelve <code className="bg-blue-100 px-1 rounded font-mono">response.data</code> tipado con la interface del <strong>Model</strong>.</li>
-                <li>La <strong>Page</strong> actualiza el estado con <code className="bg-blue-100 px-1 rounded font-mono">setState</code> y React re-renderiza la UI.</li>
+                <li>
+                  El usuario llena un formulario en la <strong>Page</strong> y
+                  hace submit.
+                </li>
+                <li>
+                  La <strong>Page</strong> llama a una función del{" "}
+                  <strong>Service</strong> correspondiente.
+                </li>
+                <li>
+                  El <strong>Service</strong> usa la instancia de Axios de{" "}
+                  <strong>axiosConfig</strong> para hacer el request HTTP al
+                  backend.
+                </li>
+                <li>
+                  El backend Spring Boot procesa la petición y responde con un
+                  DTO en JSON.
+                </li>
+                <li>
+                  Axios recibe la respuesta, el service devuelve{" "}
+                  <code className="bg-blue-100 px-1 rounded font-mono">
+                    response.data
+                  </code>{" "}
+                  tipado con la interface del <strong>Model</strong>.
+                </li>
+                <li>
+                  La <strong>Page</strong> actualiza el estado con{" "}
+                  <code className="bg-blue-100 px-1 rounded font-mono">
+                    setState
+                  </code>{" "}
+                  y React re-renderiza la UI.
+                </li>
               </ol>
             </div>
 
