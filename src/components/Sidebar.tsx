@@ -3,6 +3,7 @@ import React from "react";
 const Sidebar: React.FC = () => {
   const sections = [
     { name: "Dependencias", id: "dependencias" },
+    { name: "Estructura del Proyecto", id: "estructura" },
     { name: "Properties", id: "config" },
     { name: "Entidades (JPA)", id: "entity" },
     { name: "DTO & Validaciones", id: "dto" },

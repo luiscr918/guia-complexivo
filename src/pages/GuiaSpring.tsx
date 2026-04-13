@@ -21,7 +21,8 @@ export const GuiaSpring = () => {
               Persistencia, Validación y Servicios REST.
             </p>
           </header>
-          {/* 0. Dependencias */}
+
+          {/* 00. DEPENDENCIAS */}
           <section id="dependencias" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
               00. Dependencias
@@ -40,7 +41,6 @@ export const GuiaSpring = () => {
               dependencias:
             </p>
 
-            {/* Project config */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
               {[
                 ["Project", "Maven"],
@@ -64,7 +64,6 @@ export const GuiaSpring = () => {
               ))}
             </div>
 
-            {/* Dependencies list */}
             <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">
               Dependencies
             </p>
@@ -136,7 +135,6 @@ export const GuiaSpring = () => {
               ))}
             </div>
 
-            {/* MapStruct warning */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900">
               <p className="font-bold mb-1">
                 ⚠️ MapStruct — Agregar manualmente en pom.xml
@@ -148,10 +146,99 @@ export const GuiaSpring = () => {
               </p>
             </div>
           </section>
-          {/* 1. CONFIGURACIÓN */}
+
+          {/* 01. ESTRUCTURA */}
+          <section id="estructura" className="scroll-mt-24 mb-20">
+            <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
+              01. Estructura del Proyecto
+            </h2>
+            <p className="mb-6 text-slate-600">
+              Estructura de paquetes recomendada para un proyecto Spring Boot
+              con seguridad básica (sin JWT, sin roles). Cada paquete tiene una
+              responsabilidad clara y separada.
+            </p>
+
+            <div className="bg-slate-900 rounded-xl p-6 font-mono text-sm mb-8 overflow-x-auto">
+              <pre className="text-slate-300 leading-7">{`tuproyecto/
+└─ src/main/java/com/tugrupo/tuproyecto/
+   ├─ config/
+   │  ├─ ApplicationConfig.java   ← Beans de seguridad (BCrypt, AuthManager)
+   │  └─ SecurityConfig.java      ← Reglas de rutas públicas y protegidas
+   │
+   ├─ controller/
+   │  ├─ AuthController.java      ← POST /auth/register  POST /auth/login
+   │  ├─ MascotaController.java   ← CRUD /mascotas
+   │  └─ RazaController.java      ← CRUD /razas
+   │
+   ├─ dto/
+   │  ├─ AuthRequest.java         ← { email, password } → login
+   │  ├─ AuthResponse.java        ← { id, email }       ← respuesta login
+   │  ├─ MascotaDTO.java
+   │  ├─ RazaDTO.java
+   │  └─ UsuarioDTO.java
+   │
+   ├─ entity/
+   │  ├─ Mascota.java
+   │  ├─ Raza.java
+   │  └─ Usuario.java             ← implements UserDetails
+   │
+   ├─ mapper/
+   │  ├─ MascotaMapper.java
+   │  ├─ RazaMapper.java
+   │  └─ UsuarioMapper.java
+   │
+   ├─ repository/
+   │  ├─ MascotaRepository.java
+   │  ├─ RazaRepository.java
+   │  └─ UsuarioRepository.java   ← debe tener findByEmail()
+   │
+   └─ service/
+      ├─ AuthService.java         ← register() + authenticate()
+      ├─ MascotaService.java
+      ├─ RazaService.java
+      └─ UsuarioService.java`}</pre>
+            </div>
+
+            <div className="space-y-3 text-sm text-slate-600">
+              {[
+                [
+                  "config/",
+                  "Paquete que le falta al proyecto incompleto. Aquí van ApplicationConfig (define BCrypt, UserDetailsService, AuthenticationManager) y SecurityConfig (define qué rutas son públicas).",
+                ],
+                [
+                  "entity/Usuario.java",
+                  "A diferencia de las otras entidades, Usuario debe implementar UserDetails para integrarse con Spring Security. Sin roles, getAuthorities() devuelve List.of().",
+                ],
+                [
+                  "repository/UsuarioRepository",
+                  "Debe tener el método Optional<Usuario> findByEmail(String email) para que Spring Security pueda buscar al usuario durante el login.",
+                ],
+                [
+                  "service/AuthService",
+                  "Servicio que orquesta el registro (cifra la contraseña con BCrypt y guarda) y el login (valida con AuthenticationManager).",
+                ],
+                [
+                  "controller/AuthController",
+                  "Expone POST /auth/register y POST /auth/login. Estas rutas deben estar en permitAll() en el SecurityConfig.",
+                ],
+              ].map(([folder, desc]) => (
+                <div
+                  key={folder}
+                  className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex gap-3"
+                >
+                  <code className="text-[#6db33f] font-bold font-mono text-xs whitespace-nowrap pt-0.5">
+                    {folder}
+                  </code>
+                  <p>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* 02. CONFIGURACIÓN */}
           <section id="config" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              01. application.properties
+              02. application.properties
             </h2>
             <p className="mb-6 text-slate-600">
               Un{" "}
@@ -162,10 +249,10 @@ export const GuiaSpring = () => {
             </p>
             <CodeBlock
               title="PostgreSQL Local Config"
-              code={`spring.application.name=repaso1
+              code={`spring.application.name=tuproyecto
 # 1. Conexión a la Base de Datos (PostgreSQL Local)
 # Cambia 'nombre_de_tu_bd' por el nombre que creaste en pgAdmin
-spring.datasource.url=jdbc:postgresql://localhost:5432/repaso1
+spring.datasource.url=jdbc:postgresql://localhost:5432/nombre_de_tu_bd
 spring.datasource.username=postgres
 spring.datasource.password=root
 
@@ -182,10 +269,10 @@ spring.web.error.include-message=always`}
             />
           </section>
 
-          {/* 2. ENTIDADES */}
+          {/* 03. ENTIDADES */}
           <section id="entity" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              02. JPA Entities & Relations
+              03. JPA Entities & Relations
             </h2>
             <p className="mb-4 text-slate-600 italic">
               Empezamos creando nuestros modelos o entidades.
@@ -360,7 +447,8 @@ private List<Usuario> usuarios;`}
             </p>
             <CodeBlock
               title="OneToMany con orphanRemoval"
-              code={`@OneToMany(mappedBy = "cultivo", cascade = CascadeType.ALL, orphanRemoval = true)`}
+              code={`@OneToMany(mappedBy = "raza", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Mascota> mascotas;`}
             />
 
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-10">
@@ -406,64 +494,53 @@ private List<Usuario> usuarios;`}
             </div>
 
             <CodeBlock
-              title="Categoria & Producto Entities"
-              code={`package com.itsqmet.repaso1.entity;
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-
-@Entity
+              title="Raza.java & Mascota.java — Entidades de ejemplo"
+              code={`@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Categoria {
+public class Raza {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nombre;
+    private String descripcion;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Producto> productos;
+    // Lado "1": NO se pone la lista en el DTO
+    @OneToMany(mappedBy = "raza", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Mascota> mascotas;
 }
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producto {
+public class Mascota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nombre;
-    private Double precio;
+    private Integer edad;
+    private String sexo;
+    private Double peso;
 
+    // Lado "N": aquí va la llave foránea
     @ManyToOne
-    @JoinColumn(name = "categoria_id")
-    private Categoria categoria;
+    @JoinColumn(name = "codigo_raza")
+    private Raza raza;
 }
 
 // Para atributos de tipo fecha:
 @JsonFormat(pattern = "yyyy-MM-dd")
 @DateTimeFormat(pattern = "yyyy-MM-dd")
-private Date fecha;
-
-// Para el id autogenerado:
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;`}
+private Date fecha;`}
             />
           </section>
 
-          {/* 3. VALIDACIONES */}
+          {/* 04. DTOs */}
           <section id="dto" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              03. DTOs & Bean Validation
+              04. DTOs & Bean Validation
             </h2>
             <p className="mb-4 text-slate-600">
               Con la dependencia de validation tenemos acceso a algunas
@@ -508,13 +585,61 @@ private Long id;`}
               </table>
             </div>
 
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 text-sm text-blue-900 space-y-2">
+              <p>
+                <strong>Maneja las relaciones en los DTOs:</strong>
+              </p>
+              <p>
+                • Si es el lado <strong>"1"</strong> (ej. Raza):{" "}
+                <strong>No pongas la lista</strong> de mascotas en el DTO.
+              </p>
+              <p>
+                • Si es el lado <strong>"N"</strong> (ej. Mascota): Pon el{" "}
+                <strong>ID</strong> y un campo descriptivo (nombre) del padre.
+              </p>
+            </div>
+
             <CodeBlock
-              title="UsuarioDTO.java — con validaciones"
-              code={`public class UsuarioDTO {
+              title="RazaDTO.java & MascotaDTO.java"
+              code={`// Lado "1" → sin lista
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RazaDTO {
+    private Long id;
+    private String nombre;
+    private String descripcion;
+}
+
+// Lado "N" → con id del padre y campo descriptivo
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class MascotaDTO {
+    private Long id;
+    private String nombre;
+    private Integer edad;
+    private String sexo;
+    private Double peso;
+    private Long id_raza;          // ID del padre
+    private String nombre_raza;    // Campo descriptivo del padre
+}`}
+            />
+
+            <CodeBlock
+              title="UsuarioDTO.java — con @JsonProperty"
+              code={`@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UsuarioDTO {
+    private Long id;
+
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Formato de email no válido")
     private String email;
 
+    // WRITE_ONLY: el cliente lo envía, pero la API no lo devuelve
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 8, message = "Mínimo 8 caracteres")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
@@ -544,65 +669,21 @@ private Long id;`}
             </p>
             <CodeBlock
               title="Enum + Uso en Entidad"
-              code={`public enum Categoria {
-    CATEGORIA1,
-    CATEGORIA2
+              code={`public enum TipoSexo {
+    MACHO,
+    HEMBRA
 }
 
 // En la entidad:
 @Enumerated(EnumType.STRING)
-private Categoria categoria;`}
-            />
-
-            <h3 className="text-lg font-bold text-slate-800 mb-3 mt-10">
-              DTOs
-            </h3>
-            <p className="mb-4 text-slate-600 text-sm">
-              Sirven para enviar y recibir solo lo que se necesite, no toda la
-              entidad completa.
-            </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-4 text-sm text-blue-900 space-y-2">
-              <p>
-                <strong>Maneja las relaciones:</strong>
-              </p>
-              <p>
-                • Si es el lado <strong>"1"</strong> (ej. Artista):{" "}
-                <strong>No pongas la lista</strong> de canciones en el DTO.
-              </p>
-              <p>
-                • Si es el lado <strong>"N"</strong> (ej. Canción): Pon el{" "}
-                <strong>ID</strong> y un campo descriptivo (nombre) del padre.
-              </p>
-            </div>
-            <CodeBlock
-              title="CategoriaDTO.java"
-              code={`package com.itsqmet.repaso1.dto;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CategoriaDTO {
-    private Long id;
-    private String nombre;
-}
-
-// @JsonProperty para controlar visibilidad:
-@JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // El cliente lo envía, pero la API no lo devuelve
-private String password;
-
-@JsonProperty(access = JsonProperty.Access.READ_ONLY) // Solo lectura
-private Long id;`}
+private TipoSexo sexo;`}
             />
           </section>
 
-          {/* 4. MAPPER */}
+          {/* 05. MAPPER */}
           <section id="mapper" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              04. MapStruct Interface
+              05. MapStruct Interface
             </h2>
             <p className="mb-4 text-slate-600">
               Para mapear desde DTO a Entity hay que agregar las dependencias de
@@ -612,7 +693,7 @@ private Long id;`}
               </code>
               , luego crear una interfaz en un nuevo paquete{" "}
               <code className="bg-slate-100 px-1 py-0.5 rounded text-sm font-mono text-slate-700">
-                com.itsqmet.repaso1.mapper
+                com.tugrupo.tuproyecto.mapper
               </code>
               .
             </p>
@@ -636,106 +717,115 @@ private Long id;`}
             />
 
             <CodeBlock
-              title="PrestamoMapper.java — Ejemplo Completo"
+              title="RazaMapper.java — Entidad sin relación anidada"
               code={`@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface PrestamoMapper {
-    // Entidad a DTO
-    @Mapping(source = "usuario.id", target = "usuarioId")
-    @Mapping(source = "libro.id", target = "libroId")
-    @Mapping(source = "usuario.nombreCompleto", target = "nombreUsuario")
-    @Mapping(source = "libro.titulo", target = "tituloLibro")
-    PrestamoDTO toDTO(Prestamo prestamo);
+public interface RazaMapper {
+    // Entidad a DTO (campos iguales → mapeo automático)
+    RazaDTO toDto(Raza raza);
 
-    // DTO a Entidad
-    @Mapping(target = "usuario", ignore = true)
-    @Mapping(target = "libro", ignore = true)
-    Prestamo toEntity(PrestamoDTO prestamoDTO);
+    // DTO a Entidad (ignoramos la lista de mascotas)
+    @Mapping(target = "mascotas", ignore = true)
+    Raza toEntity(RazaDTO razaDTO);
 
-    // Para actualizaciones parciales
+    // Para actualizar (PUT): ignoramos id y lista
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "usuario", ignore = true)
-    @Mapping(target = "libro", ignore = true)
-    void actualizarDesdeDto(PrestamoDTO dto, @MappingTarget Prestamo entidad);
+    @Mapping(target = "mascotas", ignore = true)
+    void actualizarDesdeDTO(RazaDTO dto, @MappingTarget Raza raza);
+}`}
+            />
+
+            <CodeBlock
+              title="MascotaMapper.java — Entidad con relación (aplanamiento)"
+              code={`@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface MascotaMapper {
+    // Entidad a DTO: "aplanamos" el objeto Raza
+    @Mapping(source = "raza.id",     target = "id_raza")
+    @Mapping(source = "raza.nombre", target = "nombre_raza")
+    MascotaDTO toDto(Mascota mascota);
+
+    // DTO a Entidad: ignoramos raza (la asignamos manualmente en el Service)
+    @Mapping(target = "raza", ignore = true)
+    Mascota toEntity(MascotaDTO mascotaDTO);
+
+    // Para actualizar (PUT)
+    @Mapping(target = "id",   ignore = true)
+    @Mapping(target = "raza", ignore = true)
+    void actualizarDesdeDTO(MascotaDTO dto, @MappingTarget Mascota mascota);
 }`}
             />
 
             <div className="space-y-5 mt-6 text-sm text-slate-600">
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="font-bold text-slate-800 mb-2">Paso 1: @Mapper</p>
+                <p className="font-bold text-slate-800 mb-2">
+                  @Mapper — Configuración
+                </p>
                 <p>
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
                     componentModel = "spring"
                   </code>
-                  : Crea un bean de Spring → puedes usar{" "}
+                  : Crea un bean → puedes usar{" "}
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
                     @Autowired
                   </code>{" "}
-                  en cualquier lugar.
-                </p>
-                <p className="mt-1">
+                  en el Service.{" "}
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                    nullValuePropertyMappingStrategy = IGNORE
+                    IGNORE
                   </code>
-                  : Si mandas campos vacíos (nulos), MapStruct{" "}
-                  <strong>no borrará</strong> la información que ya existe en la
-                  base de datos.
+                  : los campos null del DTO <strong>no borran</strong> lo que
+                  hay en la BD.
                 </p>
               </div>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <p className="font-bold text-slate-800 mb-2">
-                  Paso 2: toDTO — Aplanamiento
+                  toDto — Aplanamiento
                 </p>
                 <p>
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                    source = "usuario.id"
-                  </code>
-                  : Entra al objeto{" "}
-                  <code className="font-mono text-slate-700">usuario</code> y
-                  saca su <code className="font-mono text-slate-700">id</code>.
-                  Los campos con el mismo nombre en ambos lados se mapean{" "}
+                    source = "raza.id"
+                  </code>{" "}
+                  entra al objeto{" "}
+                  <code className="font-mono text-slate-700">raza</code> y saca
+                  su <code className="font-mono text-slate-700">id</code>. Los
+                  campos con el mismo nombre se mapean{" "}
                   <strong>automáticamente</strong>.
                 </p>
               </div>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <p className="font-bold text-slate-800 mb-2">
-                  Paso 3: toEntity — ¿Por qué ignore?
+                  toEntity — ignore = true en relaciones
                 </p>
                 <p>
                   El DTO solo trae el{" "}
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                    usuarioId
+                    id_raza
                   </code>{" "}
                   (un número). La entidad necesita un objeto{" "}
-                  <code className="font-mono text-slate-700">Usuario</code>{" "}
-                  completo. Al ignorarlo en MapStruct, tú buscas el usuario real
-                  en la BD dentro del <strong>Service</strong> y lo asignas
-                  manualmente.
+                  <code className="font-mono text-slate-700">Raza</code>{" "}
+                  completo. Al ignorarlo, tú buscas la raza real en la BD dentro
+                  del <strong>Service</strong> y la asignas manualmente.
                 </p>
               </div>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <p className="font-bold text-slate-800 mb-2">
-                  Paso 4: actualizarDesdeDto — El Parche
+                  actualizarDesdeDTO — El Parche (PUT)
                 </p>
                 <p>
-                  Se usa para el método <strong>PUT</strong>.{" "}
                   <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
                     @MappingTarget
                   </code>{" "}
-                  le dice a MapStruct que no cree un objeto nuevo, sino que tome
-                  la entidad ya existente y cambie sus datos. Los campos en{" "}
-                  <code className="font-mono text-slate-700">
-                    @Mapping(ignore=true)
-                  </code>{" "}
-                  son los que <strong>nunca</strong> se actualizarán.
+                  le dice a MapStruct que no cree un objeto nuevo, sino que
+                  modifique la entidad ya existente. Los campos en{" "}
+                  <code className="font-mono text-slate-700">ignore=true</code>{" "}
+                  <strong>nunca</strong> se actualizarán.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* 5. REPOSITORIOS */}
+          {/* 06. REPOSITORIOS */}
           <section id="repo" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              05. Repositorios
+              06. Repositorios
             </h2>
             <p className="mb-4 text-slate-600">
               El repositorio básico extiende de{" "}
@@ -746,111 +836,198 @@ public interface PrestamoMapper {
               convenciones de nombre de Spring Data JPA:
             </p>
             <CodeBlock
-              title="CategoriaRepository.java"
-              code={`package com.itsqmet.repaso1.repository;
+              title="RazaRepository.java"
+              code={`package com.tugrupo.tuproyecto.repository;
 
-import com.itsqmet.repaso1.entity.Categoria;
+import com.tugrupo.tuproyecto.entity.Raza;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+public interface RazaRepository extends JpaRepository<Raza, Long> {
 }`}
             />
             <CodeBlock
-              title="ProductoRepository.java — con filtros"
-              code={`package com.itsqmet.repaso1.repository;
+              title="MascotaRepository.java — con filtros"
+              code={`package com.tugrupo.tuproyecto.repository;
 
-import com.itsqmet.repaso1.entity.Producto;
+import com.tugrupo.tuproyecto.entity.Mascota;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProductoRepository extends JpaRepository<Producto, Long> {
-    // Lista de productos por categoría
-    List<Producto> findByCategoriaId(Long categoriaId);
-    // Lista de productos por proveedor
-    List<Producto> findByProveedorId(Long proveedorId);
+public interface MascotaRepository extends JpaRepository<Mascota, Long> {
+    // Filtro por raza
+    List<Mascota> findByRazaId(Long razaId);
+}`}
+            />
+            <CodeBlock
+              title="UsuarioRepository.java — findByEmail obligatorio para Security"
+              code={`package com.tugrupo.tuproyecto.repository;
+
+import com.tugrupo.tuproyecto.entity.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    // OBLIGATORIO para Spring Security: busca el usuario por email durante el login
+    Optional<Usuario> findByEmail(String email);
 }`}
             />
           </section>
 
-          {/* 6. SERVICE */}
+          {/* 07. SERVICE */}
           <section id="service" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              06. Business Logic (Service)
+              07. Business Logic (Service)
             </h2>
             <p className="mb-4 text-slate-600">
-              La mayoría tiene el mismo CRUD básico. Aquí se puede apreciar
-              también el filtrado de lista de productos por categoría y
-              proveedor.
+              La mayoría tiene el mismo CRUD básico con DTOs y MapStruct.
             </p>
 
             <div className="space-y-5 mb-6 text-sm text-slate-600">
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="font-bold text-slate-800 mb-1">
-                  1. @Transactional(readOnly = true)
-                </p>
-                <p>
-                  Le dice a la base de datos que solo vamos a leer. Esto hace
-                  que la consulta sea más rápida porque Spring no gasta recursos
-                  buscando cambios para guardar.
-                </p>
-              </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="font-bold text-slate-800 mb-1">
-                  2. Búsqueda Segura con .orElseThrow()
-                </p>
-                <p>
-                  En lugar de devolver un simple nulo, lanzamos una excepción si
-                  el ID no existe. Luego convertimos a DTO para que el
-                  controlador nunca reciba el objeto original de la base de
-                  datos.
-                </p>
-              </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="font-bold text-slate-800 mb-1">
-                  3. Actualización Inteligente con MapStruct
-                </p>
-                <p>
-                  Primero recupera la entidad real de la BD. Luego{" "}
-                  <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                    mapper.actualizarDesdeDto()
-                  </code>{" "}
-                  vuelca los cambios. Gracias a la configuración de MapStruct,
-                  si un campo en el DTO es null, <strong>no borra</strong> lo
-                  que ya hay en la BD.
-                </p>
-              </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="font-bold text-slate-800 mb-1">
-                  4. Flujo con Stream
-                </p>
-                <p>
-                  <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                    findAll()
-                  </code>{" "}
-                  → <code className="font-mono text-slate-700">.stream()</code>{" "}
-                  →{" "}
-                  <code className="font-mono text-slate-700">
-                    .map(mapper::toDTO)
-                  </code>{" "}
-                  →{" "}
-                  <code className="font-mono text-slate-700">
-                    .collect(Collectors.toList())
-                  </code>
-                  : Convierte cada entidad a DTO quitando campos sensibles.
-                </p>
-              </div>
+              {[
+                [
+                  "@Transactional(readOnly = true)",
+                  "Para operaciones de solo lectura. Spring no gasta recursos buscando cambios para guardar.",
+                ],
+                [
+                  ".orElseThrow()",
+                  "En lugar de devolver null, lanzamos una excepción si el ID no existe.",
+                ],
+                [
+                  "actualizarDesdeDTO(dto, existe)",
+                  "MapStruct vuelca los cambios sobre la entidad real. Si un campo del DTO es null, no borra lo que hay en la BD.",
+                ],
+                [
+                  ".stream().map(mapper::toDto).collect(...)",
+                  "Convierte cada entidad a DTO quitando campos sensibles como la contraseña.",
+                ],
+              ].map(([title, desc]) => (
+                <div
+                  key={title}
+                  className="bg-slate-50 border border-slate-200 rounded-xl p-5"
+                >
+                  <p className="font-bold text-slate-800 mb-1 font-mono text-xs">
+                    {title}
+                  </p>
+                  <p>{desc}</p>
+                </div>
+              ))}
             </div>
 
             <CodeBlock
-              title="UsuarioService.java — CRUD Completo con DTOs"
+              title="RazaService.java — CRUD completo"
+              code={`@Service
+public class RazaService {
+    @Autowired private RazaRepository razaRepository;
+    @Autowired private RazaMapper razaMapper;
+
+    @Transactional(readOnly = true)
+    public List<RazaDTO> listarRazas() {
+        return razaRepository.findAll().stream()
+            .map(razaMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public RazaDTO buscarRazaId(Long id) {
+        Raza raza = razaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Raza no encontrada"));
+        return razaMapper.toDto(raza);
+    }
+
+    @Transactional
+    public RazaDTO guardarRaza(RazaDTO razaDTO) {
+        Raza raza = razaMapper.toEntity(razaDTO);
+        return razaMapper.toDto(razaRepository.save(raza));
+    }
+
+    @Transactional
+    public RazaDTO actualizarRaza(Long id, RazaDTO razaDTO) {
+        Raza existe = razaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Raza no encontrada"));
+        razaMapper.actualizarDesdeDTO(razaDTO, existe);
+        return razaMapper.toDto(razaRepository.save(existe));
+    }
+
+    @Transactional
+    public void borrarRaza(Long id) {
+        if (!razaRepository.existsById(id)) {
+            throw new RuntimeException("Raza no encontrada");
+        }
+        razaRepository.deleteById(id);
+    }
+}`}
+            />
+
+            <CodeBlock
+              title="MascotaService.java — con asignación manual de relación"
+              code={`@Service
+public class MascotaService {
+    @Autowired private MascotaRepository mascotaRepository;
+    @Autowired private RazaRepository razaRepository;
+    @Autowired private MascotaMapper mascotaMapper;
+
+    @Transactional(readOnly = true)
+    public List<MascotaDTO> listarMascotas() {
+        return mascotaRepository.findAll().stream()
+            .map(mascotaMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public MascotaDTO buscarMascotaId(Long id) {
+        Mascota mascota = mascotaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+        return mascotaMapper.toDto(mascota);
+    }
+
+    @Transactional
+    public MascotaDTO crearMascota(MascotaDTO mascotaDTO) {
+        Mascota mascota = mascotaMapper.toEntity(mascotaDTO);
+        // Asignación manual de la relación (porque MapStruct la ignora)
+        if (mascotaDTO.getId_raza() != null) {
+            Raza raza = razaRepository.findById(mascotaDTO.getId_raza())
+                .orElseThrow(() -> new RuntimeException("Raza no encontrada"));
+            mascota.setRaza(raza);
+        }
+        return mascotaMapper.toDto(mascotaRepository.save(mascota));
+    }
+
+    @Transactional
+    public MascotaDTO actualizarMascota(Long id, MascotaDTO mascotaDTO) {
+        Mascota existe = mascotaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+        mascotaMapper.actualizarDesdeDTO(mascotaDTO, existe);
+        // Actualizamos la relación si viene un nuevo id_raza
+        if (mascotaDTO.getId_raza() != null) {
+            Raza raza = razaRepository.findById(mascotaDTO.getId_raza())
+                .orElseThrow(() -> new RuntimeException("Raza no encontrada"));
+            existe.setRaza(raza);
+        }
+        return mascotaMapper.toDto(mascotaRepository.save(existe));
+    }
+
+    @Transactional
+    public void eliminarMascota(Long id) {
+        if (!mascotaRepository.existsById(id)) {
+            throw new RuntimeException("Mascota no encontrada");
+        }
+        mascotaRepository.deleteById(id);
+    }
+}`}
+            />
+
+            <CodeBlock
+              title="UsuarioService.java — cifra la contraseña al crear"
               code={`@Service
 public class UsuarioService {
-
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private UsuarioMapper usuarioMapper;
     @Autowired private PasswordEncoder passwordEncoder;
@@ -858,34 +1035,31 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<UsuarioDTO> listarUsuarios() {
         return usuarioRepository.findAll().stream()
-            .map(usuarioMapper::toDTO)
+            .map(usuarioMapper::toDto)
             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public UsuarioDTO obtenerUsuarioPorId(Long id) {
+    public UsuarioDTO buscarUsuarioId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return usuarioMapper.toDTO(usuario);
+        return usuarioMapper.toDto(usuario);
     }
 
     @Transactional
-    public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
+    public UsuarioDTO guardarUsuario(UsuarioDTO usuarioDTO) {
         Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
-        // CIFRAMOS LA CONTRASEÑA AQUÍ
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        return usuarioMapper.toDTO(usuarioRepository.save(usuario));
+        // CIFRAMOS LA CONTRASEÑA ANTES DE GUARDAR
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
+        return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
     @Transactional
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        // 1. Buscamos el usuario real
-        Usuario existente = usuarioRepository.findById(id)
+        Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        // 2. MapStruct actualiza campos (null = no sobrescribe)
-        usuarioMapper.actualizarDesdeDto(usuarioDTO, existente);
-        // 3. Guardamos la entidad actualizada
-        return usuarioMapper.toDTO(usuarioRepository.save(existente));
+        usuarioMapper.actualizarDesdeDTO(usuarioDTO, usuario);
+        return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
     @Transactional
@@ -897,167 +1071,165 @@ public class UsuarioService {
     }
 }`}
             />
-
-            <CodeBlock
-              title="ProductService.java — con filtros personalizados"
-              code={`@Service
-public class ProductService {
-    @Autowired private ProductoRepository productoRepository;
-
-    public List<Producto> allProductos() {
-        return productoRepository.findAll();
-    }
-
-    public Optional<Producto> productoId(Long id) {
-        return productoRepository.findById(id);
-    }
-
-    public Producto guardarProducto(Producto producto) {
-        return productoRepository.save(producto);
-    }
-
-    public void eliminarProducto(Long id) {
-        productoRepository.deleteById(id);
-    }
-
-    // OBTENER LOS PRODUCTOS POR CATEGORÍA
-    public List<Producto> productosCategoria(Long categoriaId) {
-        return productoRepository.findByCategoriaId(categoriaId);
-    }
-
-    // OBTENER LOS PRODUCTOS POR PROVEEDOR
-    public List<Producto> productosProveedor(Long proveedorId) {
-        return productoRepository.findByProveedorId(proveedorId);
-    }
-}`}
-            />
           </section>
 
-          {/* 7. CONTROLLER */}
+          {/* 08. CONTROLLER */}
           <section id="controller" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              07. REST Controllers
+              08. REST Controllers
             </h2>
             <p className="mb-4 text-slate-600">
-              Los cambios clave respecto al CRUD antiguo: los métodos ahora son
-              de tipo DTO, se usa{" "}
+              Los métodos son de tipo DTO, se usa{" "}
               <code className="bg-slate-100 px-1 py-0.5 rounded text-sm font-mono text-slate-700">
                 @Valid
               </code>{" "}
-              para disparar las validaciones, y se devuelven los códigos HTTP
+              para disparar las validaciones y se devuelven los códigos HTTP
               correctos.
             </p>
+
             <CodeBlock
-              title="UsuarioController.java"
+              title="RazaController.java"
               code={`@RestController
-@RequestMapping("/usuarios")
-public class UsuarioController {
+@RequestMapping("/razas")
+public class RazaController {
+    @Autowired private RazaService razaService;
 
-    private final UsuarioService usuarioService;
+    @GetMapping
+    public ResponseEntity<List<RazaDTO>> listarRazas() {
+        return ResponseEntity.ok(razaService.listarRazas());
+    }
 
-    // Inyección por constructor (práctica recomendada)
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
+    @GetMapping("/{id}")
+    public ResponseEntity<RazaDTO> buscarRazaId(@PathVariable Long id) {
+        return ResponseEntity.ok(razaService.buscarRazaId(id));
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioDTO> crearUsuario(@Valid @RequestBody UsuarioDTO usuario) {
-        // Devolvemos 201 (Created)
-        return new ResponseEntity<>(usuarioService.crearUsuario(usuario), HttpStatus.CREATED);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
-        // Devolvemos 200 (OK) explícito
-        return ResponseEntity.ok(usuarioService.listarUsuarios());
+    public ResponseEntity<RazaDTO> crearRaza(@Valid @RequestBody RazaDTO razaDTO) {
+        return new ResponseEntity<>(razaService.guardarRaza(razaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> actualizarUsuario(
-        @PathVariable Long id,
-        @Valid @RequestBody UsuarioDTO usuarioDTO) {
-
-        UsuarioDTO actualizado = usuarioService.actualizarUsuario(id, usuarioDTO);
-        // Devolvemos 200 OK con el DTO actualizado
-        return ResponseEntity.ok(actualizado);
+    public ResponseEntity<RazaDTO> actualizarRaza(
+        @Valid @RequestBody RazaDTO razaDTO, @PathVariable Long id) {
+        return ResponseEntity.ok(razaService.actualizarRaza(id, razaDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
-        usuarioService.eliminarUsuario(id);
-        // Devolvemos 204 (No Content) porque no hay cuerpo de respuesta
+    public ResponseEntity<Void> eliminarRaza(@PathVariable Long id) {
+        razaService.borrarRaza(id);
         return ResponseEntity.noContent().build();
     }
 }`}
             />
 
             <CodeBlock
-              title="ProductoController.java — con filtros personalizados"
+              title="MascotaController.java"
               code={`@RestController
-@RequestMapping("/productos")
-public class ProductoController {
-    @Autowired private ProductService productService;
+@RequestMapping("/mascotas")
+public class MascotaController {
+    @Autowired private MascotaService mascotaService;
 
     @GetMapping
-    public List<Producto> mostrarProductos() {
-        return productService.allProductos();
+    public ResponseEntity<List<MascotaDTO>> listarMascotas() {
+        return ResponseEntity.ok(mascotaService.listarMascotas());
     }
 
     @GetMapping("/{id}")
-    public Optional<Producto> buscarProducto(@PathVariable Long id) {
-        return productService.productoId(id);
+    public ResponseEntity<MascotaDTO> buscarMascotaId(@PathVariable Long id) {
+        return ResponseEntity.ok(mascotaService.buscarMascotaId(id));
     }
 
     @PostMapping
-    public Producto guardarProducto(@RequestBody Producto producto) {
-        return productService.guardarProducto(producto);
+    public ResponseEntity<MascotaDTO> crearMascota(@Valid @RequestBody MascotaDTO mascotaDTO) {
+        return new ResponseEntity<>(mascotaService.crearMascota(mascotaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public Producto actualizarProducto(@RequestBody Producto producto, @PathVariable Long id) {
-        Optional<Producto> productoOptional = productService.productoId(id);
-        if (productoOptional.isPresent()) {
-            Producto productoExiste = productoOptional.get();
-            productoExiste.setNombre(producto.getNombre());
-            productoExiste.setStock(producto.getStock());
-            productoExiste.setPrecio(producto.getPrecio());
-            return productService.guardarProducto(productoExiste);
-        }
-        return null;
+    public ResponseEntity<MascotaDTO> actualizarMascota(
+        @Valid @RequestBody MascotaDTO mascotaDTO, @PathVariable Long id) {
+        return ResponseEntity.ok(mascotaService.actualizarMascota(id, mascotaDTO));
     }
 
-    @GetMapping("/categoria/{categoriaId}")
-    public List<Producto> productosPorCategoria(@PathVariable Long categoriaId) {
-        return productService.productosCategoria(categoriaId);
-    }
-
-    @GetMapping("/proveedor/{proveedorId}")
-    public List<Producto> productosPorProveedor(@PathVariable Long proveedorId) {
-        return productService.productosProveedor(proveedorId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarMascota(@PathVariable Long id) {
+        mascotaService.eliminarMascota(id);
+        return ResponseEntity.noContent().build();
     }
 }`}
             />
           </section>
 
-          {/* 8. SECURITY */}
+          {/* 09. SECURITY */}
           <section id="security" className="scroll-mt-24 mb-20">
             <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
-              08. Spring Security (Sin JWT, Sin Roles)
+              09. Spring Security (Sin JWT, Sin Roles)
             </h2>
             <p className="mb-4 text-slate-600">
-              Nuestro sistema usa <strong>Spring Security</strong> con
-              autenticación basada en sesión HTTP estándar y cifrado de
-              contraseñas con <strong>BCrypt</strong>. No se usan tokens JWT ni
-              roles: cualquier usuario autenticado tiene acceso a los endpoints
-              protegidos.
+              Nuestro sistema usa <strong>Spring Security</strong> con cifrado
+              de contraseñas <strong>BCrypt</strong>.
             </p>
 
-            {/* 8.1 Entity */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900 mb-8 space-y-1">
+              <p className="font-bold">📁 Archivos que hay que crear:</p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  config/ApplicationConfig.java
+                </code>
+              </p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  config/SecurityConfig.java
+                </code>
+              </p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  dto/AuthRequest.java
+                </code>
+              </p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  dto/AuthResponse.java
+                </code>
+              </p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  service/AuthService.java
+                </code>
+              </p>
+              <p>
+                •{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  controller/AuthController.java
+                </code>
+              </p>
+              <p>
+                • Modificar{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  entity/Usuario.java
+                </code>{" "}
+                → implementar UserDetails
+              </p>
+              <p>
+                • Agregar{" "}
+                <code className="bg-amber-100 px-1 rounded font-mono">
+                  findByEmail()
+                </code>{" "}
+                en UsuarioRepository
+              </p>
+            </div>
+
+            {/* 9.1 Entity */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-8">
               1. Entidad Usuario — Implements UserDetails
             </h3>
             <p className="mb-4 text-slate-600 text-sm">
-              La entidad implementa{" "}
+              La entidad debe implementar{" "}
               <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
                 UserDetails
               </code>{" "}
@@ -1069,8 +1241,8 @@ public class ProductoController {
               (username).
             </p>
             <CodeBlock
-              title="Usuario.java"
-              code={`package com.itsqmet.repaso1.entity;
+              title="entity/Usuario.java"
+              code={`package com.tugrupo.tuproyecto.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -1099,13 +1271,12 @@ public class Usuario implements UserDetails {
     // Métodos de UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Sin roles: devolvemos lista vacía
-        return List.of();
+        return List.of(); // Sin roles: lista vacía
     }
 
     @Override
     public String getUsername() {
-        return email; // Usamos el email como nombre de usuario
+        return email; // Usamos el email como identificador
     }
 
     @Override public boolean isAccountNonExpired()    { return true; }
@@ -1117,58 +1288,44 @@ public class Usuario implements UserDetails {
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6 text-sm text-blue-900 space-y-2 mt-4">
               <p>
-                • <strong>Como @Entity</strong>: Le dice a JPA/Hibernate que
-                cree una tabla con campos para id, email y password.
-              </p>
-              <p>
-                • <strong>Como UserDetails</strong>: Le dice a Spring Security
-                que esta clase contiene la información de autenticación del
-                usuario.
+                • <strong>implements UserDetails</strong>: Le dice a Spring
+                Security que esta clase contiene la información de
+                autenticación.
               </p>
               <p>
                 • <strong>getUsername()</strong>: Sobrescrito para devolver el
-                email. Así el correo electrónico es el identificador de login.
+                email, que será el identificador de login.
               </p>
               <p>
                 • Los métodos{" "}
                 <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">
                   isAccountNonExpired()
                 </code>
-                , etc. devuelven siempre true. En una app real podrías tener un
-                campo{" "}
+                , etc. devuelven siempre{" "}
+                <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">
+                  true
+                </code>
+                . En una app real usarías un campo{" "}
                 <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">
                   boolean activo
                 </code>{" "}
-                en la BD y usarlo en{" "}
-                <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">
-                  isEnabled()
-                </code>
-                .
+                en la BD.
               </p>
             </div>
 
-            {/* 8.2 ApplicationConfig */}
+            {/* 9.2 ApplicationConfig */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-8">
               2. ApplicationConfig — El Motor de Autenticación
             </h3>
             <p className="mb-4 text-slate-600 text-sm">
-              Esta clase define los "ladrillos" (Beans) que Spring Security
-              necesita: cómo buscar al usuario y cómo cifrar su contraseña.{" "}
-              <strong>Asegúrate</strong> de que en tu{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                UsuarioRepository
-              </code>{" "}
-              tengas el método{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                Optional&lt;Usuario&gt; findByEmail(String email)
-              </code>
-              .
+              Define los "ladrillos" (Beans) que Spring Security necesita: cómo
+              buscar al usuario y cómo cifrar su contraseña.
             </p>
             <CodeBlock
-              title="ApplicationConfig.java"
-              code={`package com.itsqmet.repaso1.config;
+              title="config/ApplicationConfig.java"
+              code={`package com.tugrupo.tuproyecto.config;
 
-import com.itsqmet.repaso1.repository.UsuarioRepository;
+import com.tugrupo.tuproyecto.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -1186,14 +1343,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
     private final UsuarioRepository usuarioRepository;
 
-    // Cómo buscar al usuario (por email)
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> usuarioRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
 
-    // Motor que compara contraseña enviada vs hash en BD
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
@@ -1202,13 +1357,12 @@ public class ApplicationConfig {
         return authProvider;
     }
 
-    // Expone el AuthenticationManager para usarlo en el servicio de auth
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+        throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // BCrypt: estándar de la industria para cifrar contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -1220,11 +1374,11 @@ public class ApplicationConfig {
               {[
                 [
                   "UserDetailsService",
-                  "Toma el username (email) y lo busca en la BD. Si no existe, lanza excepción.",
+                  "Toma el email y lo busca en la BD con findByEmail(). Si no existe, lanza excepción y detiene el login.",
                 ],
                 [
                   "PasswordEncoder (BCrypt)",
-                  "No guarda '12345', guarda un hash irreversible. BCrypt toma la contraseña escrita, la procesa y la compara con el hash guardado.",
+                  "No guarda '12345', guarda un hash irreversible. Cada vez que alguien hace login, BCrypt compara la contraseña escrita con el hash guardado.",
                 ],
                 [
                   "AuthenticationProvider",
@@ -1232,7 +1386,7 @@ public class ApplicationConfig {
                 ],
                 [
                   "AuthenticationManager",
-                  "Expone el proceso de autenticación para usarlo en el AuthService cuando alguien hace login.",
+                  "Expone el proceso de autenticación para usarlo en el AuthService.",
                 ],
               ].map(([title, desc]) => (
                 <div
@@ -1245,18 +1399,17 @@ public class ApplicationConfig {
               ))}
             </div>
 
-            {/* 8.3 SecurityConfig */}
+            {/* 9.3 SecurityConfig */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-10">
               3. SecurityConfig — Las Reglas del Juego
             </h3>
             <p className="mb-4 text-slate-600 text-sm">
-              Aquí decidimos qué rutas son públicas y cuáles requieren estar
-              autenticado. Sin JWT, Spring Security usará las sesiones HTTP
-              estándar del navegador.
+              Aquí decidimos qué rutas son públicas y cuáles requieren
+              autenticación.
             </p>
             <CodeBlock
-              title="SecurityConfig.java"
-              code={`package com.itsqmet.repaso1.config;
+              title="config/SecurityConfig.java"
+              code={`package com.tugrupo.tuproyecto.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -1279,30 +1432,30 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) // Desactivado para APIs REST
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // Login y Registro son públicos
-                .anyRequest().authenticated()            // Todo lo demás requiere login
-            )
-            .authenticationProvider(authenticationProvider);
-
-        return http.build();
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf->csrf.disable())
+                .authorizeHttpRequests(auth->auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .securityContext((context) -> context
+                        .securityContextRepository(new HttpSessionSecurityContextRepository())
+                )
+                .authenticationProvider(authenticationProvider);
+        return  http.build();
     }
 
-    // CORS: permite llamadas desde Angular (4200) o React/Vite (5173)
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    public CorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration configuration=new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
         configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",configuration);
         return source;
     }
 }`}
@@ -1312,11 +1465,11 @@ public class SecurityConfig {
               {[
                 [
                   "@EnableWebSecurity",
-                  "Activa la seguridad web de Spring en todo el proyecto. Sin esto, el backend estaría totalmente abierto.",
+                  "Activa la seguridad en todo el proyecto. Sin esto, el backend queda completamente abierto.",
                 ],
                 [
                   ".csrf(disable())",
-                  "Desactivamos la protección CSRF. En APIs REST (especialmente cuando Angular consume el backend) no se usan cookies de sesión de la forma tradicional que requiere CSRF.",
+                  "Desactivado para APIs REST. Las APIs con frontend separado no necesitan protección CSRF.",
                 ],
                 [
                   "/auth/** → permitAll()",
@@ -1324,11 +1477,11 @@ public class SecurityConfig {
                 ],
                 [
                   ".anyRequest().authenticated()",
-                  "Red de seguridad: cualquier ruta nueva que crees en el futuro estará protegida por defecto.",
+                  "Cualquier ruta nueva que crees estará protegida por defecto.",
                 ],
                 [
                   "CORS",
-                  "Permite que tu backend reciba llamadas desde otros puertos: Angular (4200) y React/Vite (5173).",
+                  "Permite llamadas desde Angular (4200) o React/Vite (5173).",
                 ],
               ].map(([title, desc]) => (
                 <div
@@ -1343,12 +1496,12 @@ public class SecurityConfig {
               ))}
             </div>
 
-            {/* 8.4 DTOs de Auth */}
+            {/* 9.4 DTOs Auth */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-10">
               4. DTOs de Autenticación
             </h3>
             <CodeBlock
-              title="AuthRequest.java & AuthResponse.java"
+              title="dto/AuthRequest.java & dto/AuthResponse.java"
               code={`// Lo que el cliente envía para hacer login
 @Data
 @Builder
@@ -1359,7 +1512,7 @@ public class AuthRequest {
     private String password;
 }
 
-// Lo que el servidor responde tras un login/registro exitoso
+// Lo que el servidor responde tras login/registro exitoso
 @Data
 @Builder
 @AllArgsConstructor
@@ -1367,31 +1520,22 @@ public class AuthRequest {
 public class AuthResponse {
     private Long id;
     private String email;
-    // Puedes agregar más campos informativos según necesites
 }`}
             />
 
-            {/* 8.5 AuthService */}
+            {/* 9.5 AuthService */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-10">
               5. AuthService — Registro y Login
             </h3>
-            <p className="mb-4 text-slate-600 text-sm">
-              Orquesta el flujo de entrada. El registro cifra la contraseña y
-              guarda al usuario. El login valida las credenciales con el{" "}
-              <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">
-                AuthenticationManager
-              </code>
-              .
-            </p>
             <CodeBlock
-              title="AuthService.java"
-              code={`package com.itsqmet.repaso1.service;
+              title="service/AuthService.java"
+              code={`package com.tugrupo.tuproyecto.service;
 
-import com.itsqmet.repaso1.dto.AuthRequest;
-import com.itsqmet.repaso1.dto.AuthResponse;
-import com.itsqmet.repaso1.dto.UsuarioDTO;
-import com.itsqmet.repaso1.entity.Usuario;
-import com.itsqmet.repaso1.repository.UsuarioRepository;
+import com.tugrupo.tuproyecto.dto.AuthRequest;
+import com.tugrupo.tuproyecto.dto.AuthResponse;
+import com.tugrupo.tuproyecto.dto.UsuarioDTO;
+import com.tugrupo.tuproyecto.entity.Usuario;
+import com.tugrupo.tuproyecto.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -1405,75 +1549,54 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     // REGISTRO: crea el usuario cifrando la contraseña
     @Transactional
-    public AuthResponse register(UsuarioDTO request) {
-        Usuario usuario = new Usuario();
-        usuario.setEmail(request.getEmail());
-        // CIFRAMOS LA CONTRASEÑA ANTES DE GUARDAR
-        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        Usuario guardado = usuarioRepository.save(usuario);
-
-        return new AuthResponse(guardado.getId(), guardado.getEmail());
+    public AuthResponse register(UsuarioDTO usuarioDTO) {
+        Usuario usuario=new Usuario();
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
+        Usuario guardado=usuarioRepository.save(usuario);
+        return new AuthResponse(guardado.getId(),guardado.getEmail());
     }
 
-    // LOGIN: valida credenciales y devuelve datos del usuario
+    // LOGIN: valida credenciales
     @Transactional
-    public AuthResponse authenticate(AuthRequest request) {
-        // Si las credenciales son incorrectas, esto lanza una excepción automáticamente
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    public AuthResponse login(AuthRequest request){
+        Authentication auth=authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
         );
-        // Si llegamos aquí, las credenciales son válidas
-        var user = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        HttpSession session = httpServletRequest.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        var user=usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
         return new AuthResponse(user.getId(), user.getEmail());
+    }
+    // LOGOUT: Cerrar Sesión
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
     }
 }`}
             />
 
-            <div className="space-y-3 mt-4 text-sm text-slate-600">
-              {[
-                [
-                  "Registro",
-                  "Nunca se guarda la contraseña en texto plano. BCrypt la convierte en un hash irreconocible antes de llegar al repository.save().",
-                ],
-                [
-                  "Login con AuthenticationManager",
-                  "Es la línea más importante. Si la contraseña es incorrecta o el correo no existe, lanza una excepción automáticamente y detiene el proceso.",
-                ],
-                [
-                  "@Transactional en el Registro",
-                  "Si el usuario se guarda pero algo más falla, la transacción se deshace y no quedan registros incompletos en la BD.",
-                ],
-              ].map(([title, desc]) => (
-                <div
-                  key={title}
-                  className="bg-slate-50 border border-slate-200 rounded-xl p-4"
-                >
-                  <p className="font-bold text-slate-800 mb-1">{title}</p>
-                  <p>{desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* 8.6 AuthController */}
+            {/* 9.6 AuthController */}
             <h3 className="text-lg font-bold text-slate-800 mb-4 mt-10">
               6. AuthController — La Puerta de Entrada
             </h3>
-            <p className="mb-4 text-slate-600 text-sm">
-              Expone los endpoints de seguridad al mundo exterior (Postman,
-              Angular, etc.).
-            </p>
             <CodeBlock
-              title="AuthController.java"
-              code={`package com.itsqmet.repaso1.controller;
+              title="controller/AuthController.java"
+              code={`package com.tugrupo.tuproyecto.controller;
 
-import com.itsqmet.repaso1.dto.AuthRequest;
-import com.itsqmet.repaso1.dto.AuthResponse;
-import com.itsqmet.repaso1.dto.UsuarioDTO;
-import com.itsqmet.repaso1.service.AuthService;
+import com.tugrupo.tuproyecto.dto.AuthRequest;
+import com.tugrupo.tuproyecto.dto.AuthResponse;
+import com.tugrupo.tuproyecto.dto.UsuarioDTO;
+import com.tugrupo.tuproyecto.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -1485,13 +1608,13 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // POST /auth/register — Crea un nuevo usuario
+    // POST /auth/register
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UsuarioDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    // POST /auth/login — Valida credenciales y devuelve datos del usuario
+    // POST /auth/login
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
@@ -1499,34 +1622,10 @@ public class AuthController {
 }`}
             />
 
-            <div className="space-y-3 mt-4 text-sm text-slate-600">
-              {[
-                [
-                  "/register",
-                  "Recibe los datos del nuevo usuario (UsuarioDTO) y los pasa al servicio para cifrarlo y guardarlo.",
-                ],
-                [
-                  "/login",
-                  "Recibe email y password (AuthRequest). Si son correctos, devuelve los datos del usuario (AuthResponse). Por seguridad, siempre usa POST para que las credenciales no viajen visibles en la URL.",
-                ],
-              ].map(([title, desc]) => (
-                <div
-                  key={title}
-                  className="bg-slate-50 border border-slate-200 rounded-xl p-4"
-                >
-                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
-                    {title}
-                  </p>
-                  <p>{desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Summary box */}
+            {/* Summary */}
             <div className="mt-10 bg-[#6db33f]/10 border border-[#6db33f]/30 rounded-2xl p-6">
               <p className="font-bold text-slate-800 mb-3">
-                {" "}
-                Resumen del flujo completo
+                🔐 Resumen del flujo completo
               </p>
               <ol className="space-y-2 text-sm text-slate-700 list-decimal list-inside">
                 <li>
@@ -1541,26 +1640,37 @@ public class AuthController {
                   .
                 </li>
                 <li>
-                  Spring Security pasa por{" "}
+                  Spring Security usa{" "}
                   <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
                     ApplicationConfig
                   </code>{" "}
-                  → busca el usuario por email → compara el password con BCrypt.
+                  → busca al usuario por email (
+                  <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
+                    findByEmail
+                  </code>
+                  ) → compara el password con BCrypt.
                 </li>
                 <li>
                   Si las credenciales son válidas, el servidor devuelve el{" "}
                   <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
                     AuthResponse
                   </code>{" "}
-                  con los datos del usuario.
+                  con id y email.
                 </li>
                 <li>
-                  Para acceder a cualquier endpoint protegido, el usuario debe
-                  estar autenticado. Cualquier ruta bajo{" "}
+                  Para acceder a cualquier endpoint protegido el usuario debe
+                  estar autenticado. Solo las rutas bajo{" "}
                   <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
                     /auth/**
                   </code>{" "}
-                  es pública.
+                  son públicas.
+                </li>
+                <li>
+                  Para la correcta ejecución asegurarse de que sea version de
+                  spring{" "}
+                  <code className="bg-white px-1 py-0.5 rounded font-mono text-slate-700">
+                    4.0.1
+                  </code>{" "}
                 </li>
               </ol>
             </div>
