@@ -134,6 +134,103 @@ export const GuiaKaty = () => {
                 </div>
               ))}
             </div>
+            {/* 01. ESTRUCTURA */}
+            <section id="estructura" className="scroll-mt-24 mb-20">
+              <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-[#6db33f] inline-block mb-8 font-mono">
+                01. Estructura del Proyecto
+              </h2>
+
+              <p className="mb-6 text-slate-600">
+                Organización recomendada del proyecto Spring Boot siguiendo buenas prácticas:
+              </p>
+
+              <CodeBlock
+                title="Project Structure"
+                code={`src
+└── main
+    ├── java
+    │   └── com.example.itsqmet
+    │       ├── controller
+    │       │   ├── IndexController.java
+    │       │   ├── CategoriaController.java
+    │       │   ├── CursoController.java
+    │       │   └── UsuarioController.java
+    │       │
+    │       ├── service
+    │       │   ├── ServicioCategoriaCurso.java
+    │       │   ├── ServicioCurso.java
+    │       │   ├── ServicioUsuario.java
+    │       │   └── DetailsService.java
+    │       │
+    │       ├── repository
+    │       │   ├── CategoriaCursoRepositorio.java
+    │       │   ├── CursoRepositorio.java
+    │       │   └── UsuarioRepositorio.java
+    │       │
+    │       ├── entity
+    │       │   ├── CategoriaCurso.java
+    │       │   ├── Curso.java
+    │       │   └── Usuario.java
+    │       │
+    │       └── security
+    │           └── securityConfig.java
+    │
+    └── resources
+        ├── templates
+        │   ├── auth
+        │   │   ├── login.html
+        │   │   └── registrar.html
+        │   │
+        │   ├── Categorias
+        │   │   ├── formularioCategoria.html
+        │   │   └── listaCategorias.html
+        │   │
+        │   ├── Cursos
+        │   │   ├── Formulario.html
+        │   │   └── listaCurso.html
+        │   │
+        │   └── index.html
+        │
+        └── application.properties`}
+              />
+
+              <div className="mt-6 space-y-3 text-sm text-slate-600">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    controller
+                  </p>
+                  <p>Maneja las rutas HTTP y conecta con los servicios.</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    service
+                  </p>
+                  <p>Contiene la lógica de negocio de la aplicación.</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    repository
+                  </p>
+                  <p>Acceso a base de datos usando JpaRepository.</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    entity
+                  </p>
+                  <p>Modelos de datos que representan las tablas.</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="font-bold text-slate-800 font-mono text-xs mb-1">
+                    security
+                  </p>
+                  <p>Configuración de autenticación y autorización.</p>
+                </div>
+              </div>
+            </section>
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900">
               <p className="font-bold mb-2">
