@@ -14,10 +14,10 @@ export const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/guia" element={<GuiaSpring />} />
-        <Route path="/guiaKaty" element={<GuiaKaty />} />
+        <Route path="/install" element={<GuiaKaty />} />
         <Route path="/react-spring" element={<GuiaReact />} />
-         <Route path="/guiaMovil" element={<GuiaMovil/>} />
-         <Route path="/guiaAngular" element={<GuiaAngular/>} />
+         <Route path="/Movil" element={<GuiaMovil/>} />
+         <Route path="/Angular" element={<GuiaAngular/>} />
       </Routes>
     </>
   );
